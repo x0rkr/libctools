@@ -31,15 +31,18 @@ int main(void)
 }
 
 
+```
 
 ## Compilation
 
 Compile your program against the installed library:
+```c
 gcc -o my_program main.c -lctools
-
+```
 For embedded targets, define the EMBEDDED macro during compilation:
+```c
 gcc -DEMBEDDED -o my_program main.c -lctools
-
+```
 
 
 
