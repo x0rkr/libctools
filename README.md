@@ -30,6 +30,8 @@ int main(void)
     return 0;
 }
 
+
+
 ## Compilation
 
 Compile your program against the installed library:
@@ -37,6 +39,9 @@ gcc -o my_program main.c -lctools
 
 For embedded targets, define the EMBEDDED macro during compilation:
 gcc -DEMBEDDED -o my_program main.c -lctools
+
+
+
 
 
 Author: radi0aktiv
