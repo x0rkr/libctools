@@ -10,12 +10,13 @@ A lightweight, dual-purpose C utility framework supporting both standard PC arch
 ## Installation
 
 Build the static libraries:
-
+```bash
 make
-
+```
 Install system-wide (requires root privileges):
+```bash
 sudo make install
-
+```
 
 Headers are installed to `/usr/local/include/` and static archives to `/usr/local/lib/`.
 
