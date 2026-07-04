@@ -48,7 +48,7 @@ gcc -DEMBEDDED -o my_program main.c -lctools
 
 
 
-Author: radi0aktiv
+Author: x0rkr
 
 
 
