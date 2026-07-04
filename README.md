@@ -16,17 +16,13 @@ A lightweight, dual-purpose C utility framework supporting both standard PC arch
 Build the static libraries:
 ```bash
 make
-
+```
 Install system-wide (requires root privileges):
-Bash
-
+```bash
 sudo make install
+```
 
-    Note: Headers are installed flatly into /usr/local/include/ and static archives are stored in /usr/local/lib/.
-
-Usage Example
-C
-
+```c
 #include <libctools.h>
 
 int main(void)
@@ -34,20 +30,17 @@ int main(void)
     println("Hello from libctools!");
     return 0;
 }
-
-Compilation
+```
+## Compilation
 
 Compile your program against the installed library cleanly:
-Bash
-
+```bash
 gcc -o my_program main.c -lctools
-
+```
 For embedded targets, define the EMBEDDED macro during compilation:
-Bash
-
+```bash
 gcc -DEMBEDDED -o my_program main.c -lctools
+```
 
 Author: x0rkr
-
-
 Developed and maintained by x0rkr
