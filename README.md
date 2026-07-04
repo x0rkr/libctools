@@ -21,7 +21,7 @@ Install system-wide (requires root privileges):
 ```bash
 sudo make install
 ```
-
+## Usage Example in C
 ```c
 #include <libctools.h>
 
