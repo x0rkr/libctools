@@ -42,5 +42,5 @@ For embedded targets, define the EMBEDDED macro during compilation:
 gcc -DEMBEDDED -o my_program main.c -lctools
 ```
 
-Author: x0rkr
+
 Developed and maintained by x0rkr
