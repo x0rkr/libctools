@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "libctools_std.h"
 
 void println(const char *format, ...)
@@ -6,14 +7,18 @@ void println(const char *format, ...)
     
     flockfile(stdout);
     
-    if (format != NULL)
-    {
+    if (format != NULL) {
         va_start(args, format);
-        vprintf(format, args);
+
+	for (int i = 0; format[i] != '\0'; i++) {
+		putchar_unlocked(format[i]);
+	}
+	
+		
         va_end(args);
     }
     
-    putchar('\n');
+    putchar_unlocked('\n');
     
     funlockfile(stdout);
 }

@@ -1,0 +1,19 @@
+# Prerequisites
+*.d
+
+# Object files and Static Archives
+*.o
+*.a
+
+# Root-level test binaries and scratch files
+test_program
+test_embed
+teststd.c
+
+# Subdirectory test files (like stdc/test)
+stdc/test
+
+# Editor/OS overhead
+.vscode/
+*.swp
+.DS_Store
