@@ -1,22 +1,28 @@
 #include "libctools_emb.h"
-#include <stdio.h>  // Used for putchar() to mock the hardware output on your PC
+#include <stdio.h>  
 
-// A low-level helper loop to print integers character by character
+// A low-level helper loop to print integers character by character safely
+
 static void putnbr_emb(int n)
 {
-    // Handle negative numbers manually
+    unsigned int num;
+
     if (n < 0)
     {
         putchar('-');
-        n = -n;
+        num = (unsigned int)(-((long)n)); 
+    }
+    else
+    {
+        num = (unsigned int)n;
     }
     
-    // Recursively strip off digits from right to left, printing them left to right
-    if (n >= 10)
+    // Recursively strip off digits from right to left
+    if (num >= 10)
     {
-        putnbr_emb(n / 10);
+        putnbr_emb(num / 10);
     }
-    putchar((n % 10) + '0'); // Convert raw remainder integer into its ASCII character
+    putchar((num % 10) + '0'); 
 }
 
 void println(const char *format, ...)
@@ -30,22 +36,18 @@ void println(const char *format, ...)
     va_list args;
     va_start(args, format);
 
-    // Loop through the format string character by character
     for (int i = 0; format[i] != '\0'; i++)
     {
-        // When we hit a format specifier '%'
         if (format[i] == '%' && format[i + 1] != '\0')
         {
-            i++; // Increment pointer index to inspect the format token type
+            i++; // Move to the format specifier
             
             if (format[i] == 's')
             {
-                // Grab the next argument as a character pointer (string)
                 char *str = va_arg(args, char *);
                 if (str == NULL)
                     str = "(null)";
                 
-                // Print the string character-by-character
                 while (*str != '\0')
                 {
                     putchar(*str++);
@@ -53,26 +55,31 @@ void println(const char *format, ...)
             } 
             else if (format[i] == 'd')
             {
-                // Grab the next argument as a standard signed integer
                 int num = va_arg(args, int);
                 putnbr_emb(num);
             }
+            else if (format[i] == 'c')
+            {
+                
+                int ch = va_arg(args, int);
+                putchar(ch);
+            }
+            else if (format[i] == '%')
+            {
+                putchar('%');
+            }
             else 
             {
-                // If it's an unrecognized or escaped character (like %%), just print the raw '%'
                 putchar('%');
                 putchar(format[i]);
             }
         } 
         else 
         {
-            // If it's a completely normal character, just pass it straight out
             putchar(format[i]);
         }
     }
 
-    // Every println must end with a clean line break
     putchar('\n');
-
     va_end(args);
 }
