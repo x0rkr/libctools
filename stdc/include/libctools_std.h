@@ -6,7 +6,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stddef.h>
-
+//println()
 void println(const char *format, ...);
+//strreplace()
+char *strreplace(const char *str, const char *old_sub, const char *new_sub);
 
 #endif /* LIBCTOOLS_STD_H */
+
