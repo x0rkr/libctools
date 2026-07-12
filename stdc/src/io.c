@@ -3,22 +3,18 @@
 
 void println(const char *format, ...)
 {
-    va_list args;
-    
     flockfile(stdout);
     
     if (format != NULL) {
+        va_list args;
         va_start(args, format);
 
-	for (int i = 0; format[i] != '\0'; i++) {
-		putchar_unlocked(format[i]);
-	}
-	
-		
+        // vfprintf handles %s, %d, etc., safely inside your locked stdout stream!
+        vfprintf(stdout, format, args);
+        
         va_end(args);
     }
     
     putchar_unlocked('\n');
-    
     funlockfile(stdout);
 }

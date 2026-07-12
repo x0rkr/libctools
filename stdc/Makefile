@@ -4,13 +4,20 @@ CC := gcc
 CFLAGS := -Wall -Wextra -O2 -Iinclude
 AR := ar
 
-all: libctools_std.a
 
-libctools_std.o: src/io.c
+SRCS := src/io.c src/string.c
+OBJS := $(SRCS:.c=.o)
+
+TARGET := libctools_std.a
+
+all: $(TARGET)
+
+
+$(TARGET): $(OBJS)
+	$(AR) rcs $@ $^
+
+src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-libctools_std.a: libctools_std.o
-	$(AR) rcs $@ $<
-
 clean:
-	rm -f libctools_std.o libctools_std.a
+	rm -f src/*.o $(TARGET)
