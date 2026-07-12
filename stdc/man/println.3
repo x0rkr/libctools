@@ -1,0 +1,36 @@
+.TH PRINTLN 3 "July 2026" "libctools" "C Library Functions"
+.SH NAME
+println \- formatted output conversion with trailing newline (thread-safe on hosted systems)
+.SH SYNOPSIS
+.B #include <libctools.h>
+.HP
+.BI "void println(const char *" format ", ...);"
+.SH DESCRIPTION
+The
+.BR println ()
+function writes output under the control of a
+.I format
+string that specifies how subsequent arguments are converted for output. A newline character ('\\n') is automatically appended to the end of the output.
+.SH AVAILABILITY
+The behavior of
+.BR println ()
+adapts dynamically depending on the compilation target:
+.TP
+.B Desktop / Hosted (stdc)
+Outputs directly to 
+.IR stdout .
+The function internally invokes
+.BR flockfile (3)
+prior to writing, and
+.BR funlockfile (3)
+upon completion. This guarantees that the output block and its trailing newline are written atomically, preventing thread interleaving.
+.TP
+.B Embedded / Bare-metal (embedc)
+Outputs via the platform's registered hardware serial port (UART). Thread locking primitives are omitted unless explicitly supported by the target RTOS architecture.
+.SH RETURN VALUE
+None.
+.SH AUTHOR
+x0rkr \(lahttps://github.com/x0rkr/libctools\(ra
+.SH SEE ALSO
+.BR printf (3),
+.BR flockfile (3)
