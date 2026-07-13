@@ -1,5 +1,6 @@
 #include "libctools_emb.h"
 #include <stdio.h>  
+#include <stdarg.h>
 
 // A low-level helper loop to print integers character by character safely
 
