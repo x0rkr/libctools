@@ -2,9 +2,9 @@
 #define LIBCTOOLS_H
 
 #ifdef EMBEDDED
-#include <libctools_emb.h>
+#include "embedc/include/libctools_emb.h"
 #else
-#include <libctools_std.h>
+#include "stdc/include/libctools_std.h"
 #endif
 
 #endif /* LIBCTOOLS_H */
