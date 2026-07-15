@@ -4,7 +4,8 @@ CC := gcc
 CFLAGS := -Wall -Wextra -O2 -Iinclude
 
 # Define all object files needed for the embedded module
-SRCS := src/io.c src/ring_buffer.c src/mempool.
+OBJS :=src/io.o src/ring_buffer.o src/mempool.o
+SRCS := src/io.c src/ring_buffer.c src/mempool.c
 
 all: libctools_emb.o
 
