@@ -1,0 +1,115 @@
+.TH RING_BUFFER 3 "2026-07-15" "libctools" "libctools Programmer's Manual"
+.SH NAME
+ring_buffer_init, ring_buffer_is_empty, ring_buffer_is_full, ring_buffer_push, ring_buffer_pop \- lock-free embedded ring buffer FIFO queue
+.SH SYNOPSIS
+.B #include <libctools.h>
+.HP
+.BI "void ring_buffer_init(ring_buffer_t *" rb ");"
+.HP
+.BI "bool ring_buffer_is_empty(const ring_buffer_t *" rb ");"
+.HP
+.BI "bool ring_buffer_is_full(const ring_buffer_t *" rb ");"
+.HP
+.BI "bool ring_buffer_push(ring_buffer_t *" rb ", uint8_t " data ");"
+.HP
+.BI "bool ring_buffer_pop(ring_buffer_t *" rb ", uint8_t *" data ");"
+.SH DESCRIPTION
+These functions provide a lightweight, deterministic, lock-free First-In, First-Out (FIFO) queue designed specifically for resource-constrained, bare-metal, and embedded environments. 
+.PP
+The implementation utilizes a fixed-capacity circular array of size 64 to avoid dynamic memory allocation and minimize memory fragmentation. The lock-free behavior is safe for single-producer, single-consumer (SPSC) thread or interrupt contexts.
+.PP
+.BR ring_buffer_init ()
+initializes the ring buffer structure pointed to by
+.I rb
+by setting the head and tail pointers to 0.
+.PP
+.BR ring_buffer_is_empty ()
+returns 
+.B true
+if the buffer has no elements available to read, and
+.B false
+otherwise.
+.PP
+.BR ring_buffer_is_full ()
+returns
+.B true
+if the buffer has reached its maximum capacity of 63 elements (one slot is reserved to distinguish between empty and full states), and
+.B false
+otherwise.
+.PP
+.BR ring_buffer_push ()
+appends a byte of
+.I data
+to the tail of the buffer. If the buffer is full, the write is rejected and the function returns 
+.BR false .
+On success, it returns
+.BR true .
+.PP
+.BR ring_buffer_pop ()
+removes the oldest byte from the head of the buffer and stores it in the memory location pointed to by
+.I data .
+If the buffer is empty, the operation fails and the function returns
+.BR false .
+On success, it returns
+.BR true .
+.SH RETURN VALUE
+.BR ring_buffer_init ()
+returns no value.
+.PP
+The status inquiry and transaction functions return
+.B true
+on success/affirmation, or
+.B false
+on failure/negation.
+.SH ATTRIBUTES
+For an explanation of the terms used in this section, see
+.BR attributes (7).
+.TS
+box;
+lb lb lb
+l l l.
+Interface	Attribute	Value
+T{
+.BR ring_buffer_init (),
+.BR ring_buffer_is_empty (),
+.BR ring_buffer_is_full (),
+.BR ring_buffer_push (),
+.BR ring_buffer_pop ()
+T}	Thread safety	Safe under SPSC
+.TE
+.SH EXAMPLES
+Below is a simple usage snippet within an interrupt-driven UART driver:
+.PP
+.EX
+#include <libctools.h>
+
+ring_buffer_t rx_buffer;
+
+void uart_init(void) {
+    ring_buffer_init(&rx_buffer);
+}
+
+// Interrupt Service Routine (Producer)
+void UART_RX_IRQHandler(void) {
+    uint8_t byte = UART_READ_REG();
+    ring_buffer_push(&rx_buffer, byte);
+}
+
+// Main processing loop (Consumer)
+void process_incoming_data(void) {
+    uint8_t next_byte;
+    while (ring_buffer_pop(&rx_buffer, &next_byte)) {
+        // Process byte
+    }
+}
+.EE
+
+.SH AUTHOR
+Written by x0rkr (https://github.com/x0rkr).
+.SH REPORTING BUGS
+Report bugs and open issues on the GitHub repository:
+.UR https://github.com/x0rkr/libctools/issues
+.UE
+.SH SEE ALSO
+.BR println (3),
+.BR mempool (3)
