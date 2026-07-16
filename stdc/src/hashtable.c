@@ -73,3 +73,22 @@ bool ht_insert(hash_table_t *ht, const char *key, void *value) {
 
     return true;
 }
+
+// Retrieve a value by key from the hash table
+void *ht_get(hash_table_t *ht, const char *key) {
+    if (!ht || !key) return NULL;
+
+    unsigned long hash = djb2_hash(key);
+    size_t index = hash % ht->size;
+
+    // Traverse the chain at the calculated index
+    ht_node_t *current = ht->buckets[index];
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            return current->value; // Match found
+        }
+        current = current->next;
+    }
+
+    return NULL; // Key not found
+}
