@@ -92,3 +92,23 @@ void *ht_get(hash_table_t *ht, const char *key) {
 
     return NULL; // Key not found
 }
+
+// Safely free all memory allocated for the hash table
+void ht_destroy(hash_table_t *ht) {
+    if (!ht) return;
+
+    // Free each individual node chain
+    for (size_t i = 0; i < ht->size; i++) {
+        ht_node_t *current = ht->buckets[i];
+        while (current != NULL) {
+            ht_node_t *temp = current;
+            current = current->next;
+            
+            free(temp->key);   // Free the duplicated key
+            free(temp);        // Free the node structure
+        }
+    }
+
+    free(ht->buckets); // Free the master bucket pointer array
+    free(ht);          // Free the control block
+}
