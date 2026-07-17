@@ -5,7 +5,7 @@ CFLAGS := -Wall -Wextra -O2 -Iinclude
 AR := ar
 
 
-SRCS := src/io.c src/string.c src/vector.c src/hashtable.c
+SRCS := src/format.c src/string.c src/vector.c src/hashtable.c
 OBJS := $(SRCS:.c=.o)
 
 TARGET := libctools_std.a
