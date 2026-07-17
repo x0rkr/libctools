@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 //println()
-void println(const char *format, ...);
+void println(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 //strreplace()
 char *strreplace(const char *str, const char *old_sub, const char *new_sub);
