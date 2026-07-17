@@ -1,0 +1,40 @@
+.TH FORMAT 3 "2026-07-17" "libctools" "libctools Programmer's Manual"
+.SH NAME
+println \- formatted output conversion and printing with implicit newline
+.SH SYNOPSIS
+.B #include <libctools.h>
+.HP
+.BI "void println(const char *" format ", ...);"
+.SH DESCRIPTION
+The
+.BR println ()
+function writes output to the standard output stream
+.BR stdout .
+It automatically appends a newline character to the output.
+.PP
+The
+.I format
+argument is a character string that contains formatting directives similar to those in
+.BR printf (3).
+.PP
+This function is designed to be highly optimal and safe:
+.IP \(bu 3
+.B Thread Safety:
+It internally wraps execution in
+.BR flockfile (3)
+and
+.BR funlockfile (3)
+to guarantee that concurrent logging from multiple threads does not interleave.
+.IP \(bu 3
+.B Fast-Path Rendering:
+If the format string does not contain any format specifiers (no '%' characters), it bypasses the heavy
+.BR vfprintf (3)
+engine entirely and falls back to a fast raw write.
+.IP \(bu 3
+.B Security:
+The function prototype enforces compile-time type-safety checks via GCC attributes to catch incorrect format string arguments.
+.SH RETURN VALUE
+None.
+.SH SEE ALSO
+.BR printf (3),
+.BR flockfile (3)
