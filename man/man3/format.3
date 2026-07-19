@@ -1,4 +1,4 @@
-.TH FORMAT 3 "2026-07-17" "libctools" "libctools Programmer's Manual"
+.TH FORMAT 3 "2026-07-19" "libctools" "libctools Programmer's Manual"
 .SH NAME
 println \- formatted output conversion and printing with implicit newline
 .SH SYNOPSIS
@@ -8,16 +8,16 @@ println \- formatted output conversion and printing with implicit newline
 .SH DESCRIPTION
 The
 .BR println ()
-function writes output to the standard output stream
-.BR stdout .
-It automatically appends a newline character to the output.
+function writes output to the output stream. It automatically appends a newline character to the terminated output.
 .PP
 The
 .I format
 argument is a character string that contains formatting directives similar to those in
 .BR printf (3).
 .PP
-This function is designed to be highly optimal and safe:
+This function provides environmental optimizations tailored across environments:
+.SH STANDARD ENVIRONMENT (stdc)
+When using the hosted standard environment library, the implementation guarantees thread safety and high throughput via the following mechanisms:
 .IP \(bu 3
 .B Thread Safety:
 It internally wraps execution in
@@ -29,10 +29,25 @@ to guarantee that concurrent logging from multiple threads does not interleave.
 .B Fast-Path Rendering:
 If the format string does not contain any format specifiers (no '%' characters), it bypasses the heavy
 .BR vfprintf (3)
-engine entirely and falls back to a fast raw write.
+engine entirely and falls back to a high-speed raw write via
+.BR fputs_unlocked (3).
 .IP \(bu 3
-.B Security:
-The function prototype enforces compile-time type-safety checks via GCC attributes to catch incorrect format string arguments.
+.B Automatic Flushing:
+Invokes
+.BR fflush_unlocked (3)
+implicitly before releasing the stream lock to ensure instant visibility during crash reporting or pipeline redirection.
+.SH EMBEDDED ENVIRONMENT (embedc)
+When linking against the freestanding embedded object layer, the implementation drops heavy standard infrastructure dependencies and runs under strict constraints:
+.IP \(bu 3
+.B Non-Recursive Stack Safety:
+Integer parsing is written completely iteratively using a bounded static frame buffer. This entirely removes the risk of runtime stack exhaustion inside hardware interrupt service routines (ISRs) or small microcontrollers.
+.IP \(bu 3
+.B Heap Independence:
+Zero dynamic memory allocation operations occur during printing.
+.SH SECURITY
+The function prototype enforces compile-time type-safety checks across both environments via the GCC
+.BR __attribute__((format(printf, 1, 2)))
+directive. The compiler evaluates format arguments at compilation time, generating warnings or errors if variations do not match specifications.
 .SH RETURN VALUE
 None.
 .SH SEE ALSO
