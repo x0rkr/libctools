@@ -2,11 +2,11 @@
 #include <stdio.h>  
 #include <stdarg.h>
 
-// A low-level helper loop to print integers character by character safely
-
 static void putnbr_emb(int n)
 {
     unsigned int num;
+    char buffer[12]; 
+    int pos = 0;
 
     if (n < 0)
     {
@@ -18,12 +18,17 @@ static void putnbr_emb(int n)
         num = (unsigned int)n;
     }
     
-    // Recursively strip off digits from right to left
-    if (num >= 10)
+    
+    do {
+        buffer[pos++] = (num % 10) + '0';
+        num /= 10;
+    } while (num > 0);
+
+
+    while (pos > 0)
     {
-        putnbr_emb(num / 10);
+        putchar(buffer[--pos]);
     }
-    putchar((num % 10) + '0'); 
 }
 
 void println(const char *format, ...)
@@ -41,7 +46,7 @@ void println(const char *format, ...)
     {
         if (format[i] == '%' && format[i + 1] != '\0')
         {
-            i++; // Move to the format specifier
+            i++;
             
             if (format[i] == 's')
             {
@@ -61,7 +66,6 @@ void println(const char *format, ...)
             }
             else if (format[i] == 'c')
             {
-                
                 int ch = va_arg(args, int);
                 putchar(ch);
             }
