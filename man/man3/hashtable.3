@@ -1,0 +1,48 @@
+.TH HASHTABLE 3 "2026-07-21" "libctools" "libctools Programmer's Manual"
+.SH NAME
+ht_create, ht_insert, ht_get, ht_remove, ht_destroy \- thread-unsafe O(1) key-value lookup table
+.SH SYNOPSIS
+.B #include <libctools.h>
+.HP
+.BI "hash_table_t *ht_create(size_t " initial_size ");"
+.HP
+.BI "bool ht_insert(hash_table_t *" ht ", const char *" key ", void *" value ");"
+.HP
+.BI "void *ht_get(hash_table_t *" ht ", const char *" key ");"
+.HP
+.BI "bool ht_remove(hash_table_t *" ht ", const char *" key ");"
+.HP
+.BI "void ht_destroy(hash_table_t *" ht ");"
+.SH DESCRIPTION
+The hashtable module provides dynamic, generic key-value storage using DJB2 hashing with linked-list chaining for collision handling.
+.PP
+.IP \(bu 3
+.B Dynamic Resizing:
+When the load factor exceeds 0.75 (\fIcount / size >= 0.75\fR), the table automatically doubles its bucket allocation and re-hashes existing nodes to preserve O(1) time complexity.
+.IP \(bu 3
+.B Key Memory Ownership:
+Keys passed to
+.BR ht_insert ()
+are duplicated internally via
+.BR malloc ()
+and
+.BR memcpy (),
+guaranteeing safe string ownership.
+.IP \(bu 3
+.B Item Removal:
+.BR ht_remove ()
+unlinks and frees the internal key buffer and node memory associated with a given string key without disturbing adjacent nodes in the chain.
+.SH RETURN VALUE
+.BR ht_create ()
+returns a pointer to the newly allocated table control block, or NULL on allocation failure or invalid size.
+.PP
+.BR ht_insert ()
+and
+.BR ht_remove ()
+return true on success, or false on allocation failure or missing key.
+.PP
+.BR ht_get ()
+returns a pointer to the stored value, or NULL if the key is not found.
+.SH SEE ALSO
+.BR vector (3),
+.BR string (3)
