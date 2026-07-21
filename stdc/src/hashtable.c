@@ -94,6 +94,34 @@ void *ht_get(hash_table_t *ht, const char *key) {
     return NULL; // Key not found
 }
 
+bool ht_remove(hash_table_t *ht, const char *key) {
+    if (!ht || !key) return false;
+
+    unsigned long hash = djb2_hash(key);
+    size_t index = hash % ht->size;
+
+    ht_node_t *current = ht->buckets[index];
+    ht_node_t *prev = NULL;
+
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            if (prev == NULL) {
+                ht->buckets[index] = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            free(current->key);
+            free(current);
+            ht->count--;
+            return true;
+        }
+        prev = current;
+        current = current->next;
+    }
+
+    return false;
+}
+
 // Safely free all memory allocated for the hash table
 void ht_destroy(hash_table_t *ht) {
     if (!ht) return;
