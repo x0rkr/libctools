@@ -55,15 +55,16 @@ bool ht_insert(hash_table_t *ht, const char *key, void *value) {
     }
 
     // Step 2: Key doesn't exist, allocate a new node
-    ht_node_t *new_node = malloc(sizeof(ht_node_t));
+   ht_node_t *new_node = malloc(sizeof(ht_node_t));
     if (!new_node) return false;
 
-    new_node->key = strdup(key); // Duplicate key string to own the memory
+    size_t key_len = strlen(key) + 1;
+    new_node->key = malloc(key_len);
     if (!new_node->key) {
         free(new_node);
         return false;
     }
-    
+    memcpy(new_node->key, key, key_len);
     new_node->value = value;
 
     // Step 3: Insert at the head of the singly linked list (Chaining)
