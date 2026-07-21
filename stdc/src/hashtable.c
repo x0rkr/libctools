@@ -1,6 +1,7 @@
 #include "libctools_std.h"
 #include <stdlib.h>
 #include <string.h>
+#define HT_MAX_LOAD_FACTOR 0.75
 
 // Standard DJB2 string hashing algorithm
 static unsigned long djb2_hash(const char *str) {
@@ -63,6 +64,11 @@ static bool ht_resize(hash_table_t *ht, size_t new_size) {
 
 bool ht_insert(hash_table_t *ht, const char *key, void *value) {
     if (!ht || !key) return false;
+    
+    // Check load factor prior to insertion and double buckets if threshold reached
+    if ((double)(ht->count + 1) / ht->size >= HT_MAX_LOAD_FACTOR) {
+        ht_resize(ht, ht->size * 2);
+    }
 
     // Calculate the target bucket bucket index
     unsigned long hash = djb2_hash(key);
