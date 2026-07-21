@@ -37,6 +37,7 @@ typedef struct ht_node {
     struct ht_node *next;
 } ht_node_t;
 
+
 typedef struct {
     ht_node_t **buckets;
     size_t size;
@@ -47,6 +48,8 @@ typedef struct {
 hash_table_t *ht_create(size_t initial_size);
 bool ht_insert(hash_table_t *ht, const char *key, void *value);
 void *ht_get(hash_table_t *ht, const char *key);
+bool ht_remove(hash_table_t *ht, const char *key);
 void ht_destroy(hash_table_t *ht);
+// Hash Table API
 
 #endif /* LIBCTOOLS_STD_H */
