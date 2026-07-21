@@ -9,7 +9,8 @@
 test_program
 test_embed
 teststd.c
-
+tests/test_embed_binary
+tests/test_desktop_binary 
 # Subdirectory test files (like stdc/test)
 stdc/test
 
