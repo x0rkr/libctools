@@ -37,6 +37,30 @@ hash_table_t *ht_create(size_t initial_size) {
     return ht;
 }
 
+// Internal rehash routine when load factor exceeds threshold
+static bool ht_resize(hash_table_t *ht, size_t new_size) {
+    ht_node_t **new_buckets = calloc(new_size, sizeof(ht_node_t *));
+    if (!new_buckets) return false;
+
+    for (size_t i = 0; i < ht->size; i++) {
+        ht_node_t *current = ht->buckets[i];
+        while (current != NULL) {
+            ht_node_t *next = current->next;
+            unsigned long hash = djb2_hash(current->key);
+            size_t new_index = hash % new_size;
+
+            current->next = new_buckets[new_index];
+            new_buckets[new_index] = current;
+            current = next;
+        }
+    }
+
+    free(ht->buckets);
+    ht->buckets = new_buckets;
+    ht->size = new_size;
+    return true;
+}
+
 bool ht_insert(hash_table_t *ht, const char *key, void *value) {
     if (!ht || !key) return false;
 
