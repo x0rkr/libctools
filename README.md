@@ -44,3 +44,4 @@ gcc -DEMBEDDED -o my_program main.c -lctools
 
 
 Developed and maintained by : x0rkr
+# Quick update
