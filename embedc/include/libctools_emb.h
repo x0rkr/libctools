@@ -23,23 +23,20 @@ bool ring_buffer_is_full(const ring_buffer_t *rb);
 bool ring_buffer_push(ring_buffer_t *rb, uint8_t data);
 bool ring_buffer_pop(ring_buffer_t *rb, uint8_t *data);
 
-//Mempool
-#define MEMPOOL_MAX_BLOCKS 32
+// --- Embedded Memory Pool Module ---
+#define MEMORY_MAX_BLOCKS 32
 
 typedef struct {
-    uint8_t *buffer;          
+    uint8_t *buffer;         
     size_t block_size;       
     size_t num_blocks;       
     uint32_t alloc_mask;      
 } memory_t;
 
-// Memory Pool API
+// Memory API
 bool memory_init(memory_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks);
 void *memory_alloc(memory_t *mp);
 bool memory_free(memory_t *mp, void *block_ptr);
 size_t memory_used_count(const memory_t *mp);
-bool memory_is_full(const memory_t *mp);
-bool memory_is_empty(const memory_t *mp);
-void memory_reset(memory_t *mp);
 
 #endif // LIBCTOOLS_EMB_H

@@ -2,56 +2,42 @@
 
 // Initialize the memory pool structure
 bool memory_init(memory_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks) {
-    if (!mp || !buffer || block_size == 0 || num_blocks == 0) {
-        return false;
-    }
-    
-    // Safety check: Our 32-bit mask can only track up to 32 blocks
-    if (num_blocks > MEMORY_MAX_BLOCKS) {
+    if (!mp || !buffer || block_size == 0 || num_blocks == 0 || num_blocks > MEMORY_MAX_BLOCKS) {
         return false;
     }
 
     mp->buffer = buffer;
     mp->block_size = block_size;
     mp->num_blocks = num_blocks;
-    mp->alloc_mask = 0; // All blocks start as free (0)
+    mp->alloc_mask = 0U;
 
     return true;
 }
 
 // Return the current number of allocated blocks
 size_t memory_used_count(const memory_t *mp) {
-    if (!mp) {
-        return 0;
-    }
-    
-    // GCC compiler intrinsic to count set bits in O(1) cycles
-    return (size_t)__builtin_popcount(mp->alloc_mask);
+    return mp ? (size_t)__builtin_popcount(mp->alloc_mask) : 0;
 }
 
 // Allocate a block from the pool in O(1) time
 void *memory_alloc(memory_t *mp) {
     if (!mp) return NULL;
 
-    // Check if the pool is completely full
+    // Invert mask to find free slots
     uint32_t free_mask = ~mp->alloc_mask;
     
-    // Mask off bits beyond our block count limit without 32-bit shift UB
+    // Mask off unused blocks beyond capacity safely
     if (mp->num_blocks < MEMORY_MAX_BLOCKS) {
         free_mask &= (1U << mp->num_blocks) - 1U;
     }
 
-    if (free_mask == 0) {
-        return NULL; // Out of blocks!
+    if (!free_mask) {
+        return NULL; // Pool exhausted
     }
 
-    // Find the first free block index (count trailing zeros of free_mask)
     int free_index = __builtin_ctz(free_mask);
-
-    // Mark it as allocated (set bit to 1)
     mp->alloc_mask |= (1U << free_index);
 
-    // Calculate pointer to the allocated block segment
     return mp->buffer + (free_index * mp->block_size);
 }
 
@@ -60,39 +46,29 @@ bool memory_free(memory_t *mp, void *block_ptr) {
     if (!mp || !block_ptr) return false;
 
     uint8_t *ptr = (uint8_t *)block_ptr;
+    size_t total_bytes = mp->num_blocks * mp->block_size;
 
-    // Bounds check: Make sure the pointer actually points inside our buffer
-    if (ptr < mp->buffer || ptr >= (mp->buffer + (mp->num_blocks * mp->block_size))) {
+    // Fast bounds check
+    if (ptr < mp->buffer || ptr >= (mp->buffer + total_bytes)) {
         return false;
     }
 
-    // Alignment check: Ensure pointer points to the exact start of a block boundary
-    size_t offset = ptr - mp->buffer;
+    size_t offset = (size_t)(ptr - mp->buffer);
+
+    // Exact block boundary alignment check
     if (offset % mp->block_size != 0) {
         return false;
     }
 
     size_t block_index = offset / mp->block_size;
 
-    // Double-free guard: Check if the block is actually allocated (bit is set to 1)
-    if ((mp->alloc_mask & (1U << block_index)) == 0) {
-        return false; // Block was not allocated!
+    // Double-free guard: check if block is actually allocated
+    if (!(mp->alloc_mask & (1U << block_index))) {
+        return false;
     }
 
-    // Clear the bit (set to 0) to mark it as free
+    // Clear bit
     mp->alloc_mask &= ~(1U << block_index);
 
     return true;
-}
-
-// Check if all blocks in the memory pool are allocated in O(1) time
-bool memory_is_full(const memory_t *mp) {
-    if (!mp) return false;
-    return memory_used_count(mp) == mp->num_blocks;
-}
-
-// Check if no blocks in the memory pool are allocated in O(1) time
-bool memory_is_empty(const memory_t *mp) {
-    if (!mp) return true;
-    return mp->alloc_mask == 0;
 }
