@@ -36,7 +36,7 @@ void *memory_alloc(memory_t *mp) {
     // Check if the pool is completely full
     uint32_t free_mask = ~mp->alloc_mask;
     
-    // Mask off bits beyond our block count limit
+    // Mask off bits beyond our block count limit without 32-bit shift UB
     if (mp->num_blocks < MEMORY_MAX_BLOCKS) {
         free_mask &= (1U << mp->num_blocks) - 1U;
     }
@@ -54,7 +54,6 @@ void *memory_alloc(memory_t *mp) {
     // Calculate pointer to the allocated block segment
     return mp->buffer + (free_index * mp->block_size);
 }
-
 // Free a block back into the pool in O(1) time
 bool memory_free(memory_t *mp, void *block_ptr) {
     if (!mp || !block_ptr) return false;
