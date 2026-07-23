@@ -84,3 +84,15 @@ bool memory_free(memory_t *mp, void *block_ptr) {
 
     return true;
 }
+
+// Check if all blocks in the memory pool are allocated in O(1) time
+bool memory_is_full(const memory_t *mp) {
+    if (!mp) return false;
+    return memory_used_count(mp) == mp->num_blocks;
+}
+
+// Check if no blocks in the memory pool are allocated in O(1) time
+bool memory_is_empty(const memory_t *mp) {
+    if (!mp) return true;
+    return mp->alloc_mask == 0;
+}
