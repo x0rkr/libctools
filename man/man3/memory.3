@@ -1,0 +1,35 @@
+.TH MEMORY 3 "2026-07-23" "libctools" "Embedded C Tools Manual"
+.SH NAME
+memory_init, memory_alloc, memory_free, memory_used_count \- O(1) bitmask static memory pool allocator for embedded systems
+.SH SYNOPSIS
+.B #include <libctools_emb.h>
+.sp
+.BI "bool memory_init(memory_t *" mp ", uint8_t *" buffer ", size_t " block_size ", size_t " num_blocks ");"
+.br
+.BI "void *memory_alloc(memory_t *" mp ");"
+.br
+.BI "bool memory_free(memory_t *" mp ", void *" block_ptr ");"
+.br
+.BI "size_t memory_used_count(const memory_t *" mp ");"
+.SH DESCRIPTION
+The \fBmemory\fR module provides a lightweight, constant-time \fIO(1)\fR static memory pool allocator engineered for bare-metal and resource-constrained embedded targets. Allocation state is tracked using a fast 32-bit bitmask (\fIalloc_mask\fR), avoiding dynamic heap usage and fragmentation.
+.PP
+.BR memory_init ()
+Initializes a memory pool structure \fImp\fR targeting the contiguous byte buffer \fIbuffer\fR. \fIblock_size\fR specifies the size of each chunk in bytes, and \fInum_blocks\fR specifies the available block count (maximum 32). Returns \fBtrue\fR on successful initialization, or \fBfalse\fR if any parameter is zero, NULL, or exceeds \fBMEMORY_MAX_BLOCKS\fR.
+.PP
+.BR memory_alloc ()
+Allocates the first available block from \fImp\fR in \fIO(1)\fR time using compiler trailing-zero intrinsics. Marks the corresponding bitmask slot as occupied and returns a direct pointer to the block segment. Returns \fBNULL\fR if all blocks are currently allocated or \fImp\fR is invalid.
+.PP
+.BR memory_free ()
+Frees an allocated block pointed to by \fIblock_ptr\fR back into pool \fImp\fR in \fIO(1)\fR time. Validates buffer boundaries, block alignment, and prevents double-free errors. Returns \fBtrue\fR on successful release, or \fBfalse\fR on invalid pointers, alignment errors, or unallocated blocks.
+.PP
+.BR memory_used_count ()
+Returns the current number of active allocations within \fImp\fR in constant time using population count bit-intrinsics.
+.SH RETURN VALUE
+.B memory_init\fR() and \fBmemory_free\fR() return \fBtrue\fR on success, \fBfalse\fR on failure.
+.br
+.B memory_alloc\fR() returns a non-NULL pointer to the allocated block on success, or \fBNULL\fR on failure.
+.br
+.B memory_used_count\fR() returns the count of currently allocated blocks (0..32).
+.SH SEE ALSO
+.BR ring_buffer (3)
