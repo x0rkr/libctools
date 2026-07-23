@@ -31,12 +31,12 @@ typedef struct {
     size_t block_size;       
     size_t num_blocks;       
     uint32_t alloc_mask;      
-} mempool_t;
+} memory_t;
 
 // Memory Pool API
-bool mempool_init(mempool_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks);
-void *mempool_alloc(mempool_t *mp);
-bool mempool_free(mempool_t *mp, void *block_ptr);
-size_t mempool_used_count(const mempool_t *mp);
+bool memory_init(memory_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks);
+void *memory_alloc(memory_t *mp);
+bool memory_free(memory_t *mp, void *block_ptr);
+size_t memory_used_count(const memory_t *mp);
 
 #endif // LIBCTOOLS_EMB_H
