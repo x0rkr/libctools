@@ -54,6 +54,7 @@ void *memory_alloc(memory_t *mp) {
     // Calculate pointer to the allocated block segment
     return mp->buffer + (free_index * mp->block_size);
 }
+
 // Free a block back into the pool in O(1) time
 bool memory_free(memory_t *mp, void *block_ptr) {
     if (!mp || !block_ptr) return false;
@@ -72,6 +73,11 @@ bool memory_free(memory_t *mp, void *block_ptr) {
     }
 
     size_t block_index = offset / mp->block_size;
+
+    // Double-free guard: Check if the block is actually allocated (bit is set to 1)
+    if ((mp->alloc_mask & (1U << block_index)) == 0) {
+        return false; // Block was not allocated!
+    }
 
     // Clear the bit (set to 0) to mark it as free
     mp->alloc_mask &= ~(1U << block_index);
