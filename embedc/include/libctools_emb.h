@@ -40,5 +40,6 @@ bool memory_free(memory_t *mp, void *block_ptr);
 size_t memory_used_count(const memory_t *mp);
 bool memory_is_full(const memory_t *mp);
 bool memory_is_empty(const memory_t *mp);
+void memory_reset(memory_t *mp);
 
 #endif // LIBCTOOLS_EMB_H
