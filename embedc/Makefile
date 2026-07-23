@@ -3,17 +3,17 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -O2 -Iinclude
 
-# Define all object files needed for the embedded module
-OBJS :=src/format.o src/ring_buffer.o src/mempool.o
-SRCS := src/format.c src/ring_buffer.c src/mempool.c
+# Define all object files needed for the embedded module.
+OBJS :=src/format.o src/ring_buffer.o src/memory.o
+SRCS := src/format.c src/ring_buffer.c src/memory.c
 
 all: libctools_emb.o
 
-# Link the individual object files into one partial-linked binary
+# Link the individual object files into one partial-linked binary.
 libctools_emb.o: $(OBJS)
 	ld -r $(OBJS) -o $@
 
-# Pattern rule to compile any .c file in src/ into a .o file
+# Pattern rule to compile any .c file in src/ into a .o file.
 src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
