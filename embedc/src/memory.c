@@ -1,13 +1,13 @@
 #include "libctools_emb.h"
 
 // Initialize the memory pool structure
-bool mempool_init(mempool_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks) {
+bool memory_init(memory_t *mp, uint8_t *buffer, size_t block_size, size_t num_blocks) {
     if (!mp || !buffer || block_size == 0 || num_blocks == 0) {
         return false;
     }
     
     // Safety check: Our 32-bit mask can only track up to 32 blocks
-    if (num_blocks > MEMPOOL_MAX_BLOCKS) {
+    if (num_blocks > MEMORY_MAX_BLOCKS) {
         return false;
     }
 
@@ -20,7 +20,7 @@ bool mempool_init(mempool_t *mp, uint8_t *buffer, size_t block_size, size_t num_
 }
 
 // Return the current number of allocated blocks
-size_t mempool_used_count(const mempool_t *mp) {
+size_t memory_used_count(const memory_t *mp) {
     if (!mp) {
         return 0;
     }
@@ -30,15 +30,15 @@ size_t mempool_used_count(const mempool_t *mp) {
 }
 
 // Allocate a block from the pool in O(1) time
-void *mempool_alloc(mempool_t *mp) {
+void *memory_alloc(memory_t *mp) {
     if (!mp) return NULL;
 
     // Check if the pool is completely full
     uint32_t free_mask = ~mp->alloc_mask;
     
     // Mask off bits beyond our block count limit
-    if (mp->num_blocks < MEMPOOL_MAX_BLOCKS) {
-        free_mask &= (1U << mp->num_blocks) - 1;
+    if (mp->num_blocks < MEMORY_MAX_BLOCKS) {
+        free_mask &= (1U << mp->num_blocks) - 1U;
     }
 
     if (free_mask == 0) {
@@ -56,7 +56,7 @@ void *mempool_alloc(mempool_t *mp) {
 }
 
 // Free a block back into the pool in O(1) time
-bool mempool_free(mempool_t *mp, void *block_ptr) {
+bool memory_free(memory_t *mp, void *block_ptr) {
     if (!mp || !block_ptr) return false;
 
     uint8_t *ptr = (uint8_t *)block_ptr;
